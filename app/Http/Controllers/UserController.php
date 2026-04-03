@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -42,6 +43,21 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        return new UserResource($user);
+    }
+
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ]);
+
+        if ($request->filled('password')) {
+            $user->update(['password' => $request->password]);
+        }
+
         return new UserResource($user);
     }
 }
