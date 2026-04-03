@@ -77,4 +77,67 @@ class UserTest extends TestCase
         $response = $this->getJson('/api/users/99999');
         $response->assertStatus(404);
     }
+
+    public function test_update_user()
+    {
+        $user = User::factory()->create();
+        $newData = [
+            'name' => 'Nome Atualizado',
+            'email' => 'atualizado@email.com',
+            'password' => 'NovaSenha@123',
+            'password_confirmation' => 'NovaSenha@123',
+            'phone' => '(21) 98888-7777',
+        ];
+
+        $response = $this->putJson('/api/users/' . $user->id, $newData);
+
+        $response->assertStatus(200)
+                ->assertJsonPath('data.name', 'Nome Atualizado')
+                ->assertJsonPath('data.email', 'atualizado@email.com')
+                ->assertJsonPath('data.phone', '(21) 98888-7777');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Nome Atualizado',
+            'email' => 'atualizado@email.com',
+            'phone' => '(21) 98888-7777',
+        ]);
+    }
+
+    public function test_update_user_not_found()
+    {
+        $response = $this->putJson('/api/users/99999', [
+            'name' => 'Qualquer',
+            'email' => 'qualquer@email.com',
+            'password' => 'Senha@123',
+            'password_confirmation' => 'Senha@123',
+            'phone' => '(11) 99999-9999',
+        ]);
+        $response->assertStatus(404);
+    }
+
+    public function test_update_validates_email()
+    {
+        $user1 = User::factory()->create(['email' => 'primeiro@email.com']);
+        $user2 = User::factory()->create(['email' => 'segundo@email.com']);
+
+        $response = $this->putJson('/api/users/' . $user2->id, [
+            'name' => 'Teste',
+            'email' => 'primeiro@email.com',
+            'password' => 'Senha@123',
+            'password_confirmation' => 'Senha@123',
+            'phone' => '(11) 99999-9999',
+        ]);
+        $response->assertStatus(422)
+                ->assertJsonValidationErrors(['email']);
+
+        $response = $this->putJson('/api/users/' . $user2->id, [
+            'name' => 'Teste',
+            'email' => 'segundo@email.com',
+            'password' => 'Senha@123',
+            'password_confirmation' => 'Senha@123',
+            'phone' => '(11) 99999-9999',
+        ]);
+        $response->assertStatus(200);
+    }
 }
