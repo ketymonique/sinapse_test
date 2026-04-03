@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -20,5 +21,22 @@ class UserController extends Controller
         return (new UserResource($user))
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function index(Request $request)
+    {
+        $query = User::query();
+
+        if ($request->has('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->has('filter') && isset($request->filter['name'])) {
+            $query->where('name', 'like', '%' . $request->filter['name'] . '%');
+        }
+
+        $users = $query->paginate(10);
+
+        return UserResource::collection($users);
     }
 }
