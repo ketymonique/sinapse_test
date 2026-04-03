@@ -58,4 +58,23 @@ class UserTest extends TestCase
         $response = $this->getJson('/api/users?filter[name]=teste');
         $response->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'jão teste');
     }
+
+    public function test_show_user()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson('/api/users/' . $user->id);
+
+        $response->assertStatus(200)
+                ->assertJsonStructure([
+                    'data' => ['id', 'name', 'email', 'phone', 'created_at']
+                ])
+                ->assertJsonPath('data.id', $user->id);
+    }
+
+    public function test_user_not_found()
+    {
+        $response = $this->getJson('/api/users/99999');
+        $response->assertStatus(404);
+    }
 }
