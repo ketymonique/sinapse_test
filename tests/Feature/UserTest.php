@@ -140,4 +140,32 @@ class UserTest extends TestCase
         ]);
         $response->assertStatus(200);
     }
+
+    public function test_soft_delete_user()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->deleteJson('/api/users/' . $user->id);
+        $response->assertStatus(204); 
+
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
+
+    public function test_deleted_not_in_index()
+    {
+        $user = User::factory()->create();
+        $this->deleteJson('/api/users/' . $user->id);
+
+        $response = $this->getJson('/api/users');
+        $response->assertJsonCount(0, 'data');
+    }
+
+    public function test_deleted_show_404()
+    {
+        $user = User::factory()->create();
+        $this->deleteJson('/api/users/' . $user->id);
+
+        $response = $this->getJson('/api/users/' . $user->id);
+        $response->assertStatus(404);
+    }
 }
