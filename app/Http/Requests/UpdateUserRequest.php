@@ -23,7 +23,7 @@ class UpdateUserRequest extends FormRequest
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
+                new StrongPassword,
             ],
             'phone' => 'required|regex:/^\(\d{2}\) \d{5}-\d{4}$/',
         ];
