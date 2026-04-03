@@ -11,6 +11,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
+    // success 
     public function test_create_user(): void
     {
         $userData = [
@@ -167,5 +168,36 @@ class UserTest extends TestCase
 
         $response = $this->getJson('/api/users/' . $user->id);
         $response->assertStatus(404);
+    }
+
+    // error
+    public function test_store_validation_errors()
+    {
+        $response = $this->postJson('/api/users', [
+            'name' => '',
+            'email' => 'not-an-email',
+            'password' => 'weak',
+            'password_confirmation' => 'different',
+            'phone' => 'invalid',
+        ]);
+
+        $response->assertStatus(422)
+                ->assertJsonValidationErrors(['name', 'email', 'password', 'phone']);
+    }
+
+    public function test_update_validation_errors()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->putJson('/api/users/' . $user->id, [
+            'name' => '',
+            'email' => 'not-email',
+            'password' => 'weak',
+            'password_confirmation' => 'different',
+            'phone' => '123',
+        ]);
+
+        $response->assertStatus(422)
+                ->assertJsonValidationErrors(['name', 'email', 'password', 'phone']);
     }
 }
