@@ -9,13 +9,18 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
             'created_at' => $this->created_at?->toIso8601String(),
-            'deleted_at' => $this->deleted_at?->toIso8601String(),
         ];
+
+        if ($this->deleted_at !== null) {
+            $data['deleted_at'] = $this->deleted_at->toIso8601String();
+        }
+
+        return $data;
     }
 }

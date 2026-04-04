@@ -157,19 +157,34 @@ Pode ser usada com Swagger, Postman ou Insomnia.
 ```bash
 app/
 ├── Http/
-│   ├── Controllers/UserController.php
+│   ├── Controllers/
+│   │   └── UserController.php
 │   ├── Requests/
+│   │   ├── StoreUserRequest.php
+│   │   └── UpdateUserRequest.php
 │   └── Resources/
+│       └── UserResource.php
 ├── Models/
+│   └── User.php
+├── Providers/
+│   └── AppServiceProvider.php
 └── Rules/
+    └── StrongPassword.php
 
 database/
 ├── migrations/
+│   └── ..._create_users_table.php
 └── factories/
+    └── UserFactory.php
 
 tests/
 ├── Feature/
+│   └── UserTest.php
 └── Unit/
+    └── StrongPasswordTest.php
+
+routes/
+└── api.php
 
 docker-compose.yml
 openapi.yaml
