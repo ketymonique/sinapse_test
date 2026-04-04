@@ -1,58 +1,212 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 SINAPSE TEST - API DE GERENCIAMENTO DE USUÁRIOS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API RESTful para cadastro, edição, listagem e remoção lógica de usuários, desenvolvida com **Laravel 13**, **Docker**, **PostgreSQL** e **TDD**.  
 
-## About Laravel
+Projeto criado como parte de um desafio técnico.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Docker (versão 20.10+)
+- Docker Compose
+- Git
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ⚙️ Como rodar o projeto
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Clone o repositório
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/ketymonique/sinapse_test.git
+cd sinapse_test
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Configure o `.env`
 
-## Contributing
+Copie o `.env.example` e configure:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+DB_HOST=db
+DB_DATABASE=db_sinapse
+DB_USERNAME=root
+DB_PASSWORD=root
+```
 
-## Code of Conduct
+> A `APP_KEY` será gerada automaticamente.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### 3. Suba os containers
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+docker-compose up -d
+```
 
-## License
+**Serviços iniciados:**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `sinapse_test_app` (PHP-FPM)
+- `sinapse_test_nginx` (http://localhost:8080)
+- `sinapse_test_db` (PostgreSQL - porta 5432)
+- `sinapse_test_db_test` (PostgreSQL - porta 5433)
+- `sinapse_test_redis` (Redis - porta 6379)
+
+---
+
+### 4. Gerar chave da aplicação
+
+```bash
+docker exec -it sinapse_test_app php artisan key:generate
+```
+
+### 5. Rodar migrations
+
+```bash
+docker exec -it sinapse_test_app php artisan migrate
+```
+
+### 6. Testar API
+
+Acesse:  
+👉 http://localhost:8080/api/users
+
+---
+
+## 🧪 Testes automatizados
+
+### Rodar todos os testes
+
+```bash
+docker exec -it sinapse_test_app php artisan test
+```
+
+### Rodar apenas Feature tests
+
+```bash
+docker exec -it sinapse_test_app php artisan test --testsuite=Feature
+```
+
+### Rodar teste específico
+
+```bash
+docker exec -it sinapse_test_app php artisan test --filter=StrongPasswordTest
+```
+
+---
+
+## ✅ Resultado esperado
+
+```txt
+PASS Tests\Unit\StrongPasswordTest
+PASS Tests\Feature\UserTest
+
+Tests: 28 passed
+```
+
+```
+   PASS  Tests\Unit\StrongPasswordTest
+  ✓ Validate                                                                                                                                                                                         0.02s  
+  ✓ short       
+  ✓ no uppercase
+  ✓ no lowercase
+  ✓ no number   
+  ✓ no special char
+  ✓ multiple fails
+
+   PASS  Tests\Feature\UserTest
+  ✓ create user                                                                                                                                                                                      8.23s  
+  ✓ index returns 10 users per page                                                                                                                                                                  0.67s  
+  ✓ index filters by id                                                                                                                                                                              0.21s  
+  ✓ index filters by name                                                                                                                                                                            0.18s  
+  ✓ show user                                                                                                                                                                                        0.16s  
+  ✓ user not found                                                                                                                                                                                   0.25s  
+  ✓ update user                                                                                                                                                                                      0.19s  
+  ✓ update user not found                                                                                                                                                                            0.17s  
+  ✓ update validates email                                                                                                                                                                           0.24s  
+  ✓ soft delete user                                                                                                                                                                                 0.18s  
+  ✓ deleted not in index                                                                                                                                                                             0.17s  
+  ✓ deleted show 404                                                                                                                                                                                 0.17s  
+  ✓ update validation errors                                                                                                                                                                         0.17s  
+
+  Tests:    21 passed (66 assertions)
+  Duration: 19.01s
+```
+
+---
+
+## 📚 Documentação da API
+
+A especificação completa está em:
+
+```
+openapi.yaml
+```
+
+Pode ser usada com Swagger, Postman ou Insomnia.
+
+---
+
+## 🔗 Endpoints
+
+| Método | Rota         | Descrição        |
+|--------|--------------|------------------|
+| GET    | /users       | Lista usuários   |
+| POST   | /users       | Cria usuário     |
+| GET    | /users/{id}  | Busca usuário    |
+| PUT    | /users/{id}  | Atualiza usuário |
+| DELETE | /users/{id}  | Soft delete      |
+
+---
+
+## 📁 Estrutura do projeto
+
+```bash
+app/
+├── Http/
+│   ├── Controllers/UserController.php
+│   ├── Requests/
+│   └── Resources/
+├── Models/
+└── Rules/
+
+database/
+├── migrations/
+└── factories/
+
+tests/
+├── Feature/
+└── Unit/
+
+docker-compose.yml
+openapi.yaml
+README.md
+```
+
+---
+
+## 🧠 Observações
+
+- Banco de testes isolado (`RefreshDatabase`)
+- Senhas com hash automático
+- Datas em ISO 8601
+- Validação de senha forte detalhada
+
+---
+
+## 🛠️ Comandos úteis
+
+| Ação             | Comando                                                      |
+|------------------|--------------------------------------------------------------|
+| Parar containers | `docker-compose down`                                        |
+| Rebuild          | `docker-compose up -d --build`                               |
+| Bash container   | `docker exec -it sinapse_test_app bash`                      |
+| Acessar DB       | `docker exec -it sinapse_test_db psql -U root -d db_sinapse` |
+| Limpar cache     | `php artisan config:clear`                                   |
+
+---
+
+## 👩‍💻 Desenvolvido por
+
+**Kethelyn Couto**  
+📅 Abril/2026
