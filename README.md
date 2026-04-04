@@ -97,13 +97,6 @@ docker exec -it sinapse_test_app php artisan test --filter=StrongPasswordTest
 
 ## ✅ Resultado esperado
 
-```txt
-PASS Tests\Unit\StrongPasswordTest
-PASS Tests\Feature\UserTest
-
-Tests: 28 passed
-```
-
 ```
    PASS  Tests\Unit\StrongPasswordTest
   ✓ Validate                                                                                                                                                                                         0.02s  
@@ -159,7 +152,7 @@ Pode ser usada com Swagger, Postman ou Insomnia.
 
 ---
 
-## 📁 Estrutura do projeto
+## 📁 Estrutura do projeto (Resumida)
 
 ```bash
 app/
